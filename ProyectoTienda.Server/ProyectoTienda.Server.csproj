@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProyectoTienda.BD\ProyectoTienda.BD.csproj" />
+    <ProjectReference Include="..\ProyectoTienda.Shared\ProyectoTienda.Shared.csproj" />
   </ItemGroup>
 
 </Project>

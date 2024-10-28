@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProyectoTienda.Server", "Pr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProyectoTienda.BD", "ProyectoTienda.BD\ProyectoTienda.BD.csproj", "{06C527B5-6AD9-44E3-9934-E30E5C1B760E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectoTienda.Shared", "ProyectoTienda.Shared\ProyectoTienda.Shared.csproj", "{5D551138-934F-4236-9C31-B64C2B17575B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{06C527B5-6AD9-44E3-9934-E30E5C1B760E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06C527B5-6AD9-44E3-9934-E30E5C1B760E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06C527B5-6AD9-44E3-9934-E30E5C1B760E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D551138-934F-4236-9C31-B64C2B17575B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D551138-934F-4236-9C31-B64C2B17575B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D551138-934F-4236-9C31-B64C2B17575B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D551138-934F-4236-9C31-B64C2B17575B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
