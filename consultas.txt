@@ -1,0 +1,23 @@
+INSERT INTO Categoria (NombreCat)
+VALUES
+    ('Fútbol'),
+    ('Básquetbol'),
+    ('Running');
+
+INSERT INTO Marcas (NombreMarca)
+VALUES
+    ('Nike'),
+    ('Adidas'),
+    ('Puma'),
+    ('Under Armour'),
+    ('Reebok'),
+    ('New Balance'),
+    ('Asics'),
+    ('Columbia'),
+    ('Patagonia'),
+    ('The North Face'),
+    ('Salomon'),
+    ('Fila'),
+    ('Converse'),
+    ('Umbro'),
+    ('Mizuno');
