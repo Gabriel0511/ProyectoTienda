@@ -1,68 +1,47 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoTienda.BD.Data;
 using ProyectoTienda.BD.Data.Entity;
+using ProyectoTienda.Server.Repositorio;
+using ProyectoTienda.Shared.DTO;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProyectoTienda.Server.Controllers
 {
     [ApiController]
     [Route("api/Marcas")]
-
     public class MarcasControllers : ControllerBase
     {
-        private readonly Context context;
+        private readonly IMarcaRepositorio repositorio;
+        private readonly IMapper mapper;
 
-        public MarcasControllers(Context context)
+        public MarcasControllers(IMarcaRepositorio repositorio, IMapper mapper)
         {
-            this.context = context;
+            this.repositorio = repositorio;
+            this.mapper = mapper;
         }
+
+        // Método para obtener todos los productos
         [HttpGet]
         public async Task<ActionResult<List<Marca>>> Get()
         {
-            return await context.Marcas.ToListAsync();
+            return await repositorio.Select();
         }
 
+        // Método para agregar un nuevo producto
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Marca entidad)
+        public async Task<ActionResult<int>> Post(CrearMarcaDTO entidadDTO)
         {
             try
             {
-                context.Marcas.Add(entidad);
-                await context.SaveChangesAsync();
-                return entidad.Id;
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
+                Marca entidad = mapper.Map<Marca>(entidadDTO);
 
-        [HttpPut("{id:int}")] //api/Marcas/2
-        public async Task<ActionResult> Put(int id, [FromBody] Marca entidad)
-        {
-            if (id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos");
+                return await repositorio.Insert(entidad);
             }
-
-            var existe = await context.Marcas.Where(e => e.Id == id).FirstOrDefaultAsync();
-
-            if (existe == null)
+            catch (Exception err)
             {
-                return NotFound("No existe el tipo de marca buscado");
-            }
-
-            existe.NombreMarca = entidad.NombreMarca;
-
-            try
-            {
-                context.Marcas.Update(existe);
-                await context.SaveChangesAsync();
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
+                return BadRequest(err.Message);
             }
         }
     }

@@ -1,0 +1,152 @@
+﻿@page "/api/Productos/agregar"
+@inject IHttpServicio http
+@inject NavigationManager navigationManager
+
+<h3>Agregar Producto</h3>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger" role="alert">
+        @mensajeError
+    </div>
+}
+
+<EditForm Model="producto" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Nombre Producto</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@producto.NombreProd" />
+            <ValidationMessage For="@(() => producto.NombreProd)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Descripción</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@producto.Descripcion" />
+            <ValidationMessage For="@(() => producto.Descripcion)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Equipo</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@producto.Equipo" />
+            <ValidationMessage For="@(() => producto.Equipo)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Liga</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@producto.Liga" />
+            <ValidationMessage For="@(() => producto.Liga)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Precio</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="@producto.Precio" />
+            <ValidationMessage For="@(() => producto.Precio)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Talle</label>
+        <div>
+            <select class="form-control" @bind="producto.Talle">
+                <option value="">Seleccione un talle</option>
+                @foreach (var talle in talles)
+                {
+                    <option value="@talle">@talle</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => producto.Talle)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Cantidad en inventario</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="@producto.CantidadEnInventario" />
+            <ValidationMessage For="@(() => producto.CantidadEnInventario)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Categoría</label>
+        <div>
+            <select class="form-control" @bind="producto.CategoriaId">
+                <option value="">Seleccione una categoría</option>
+                @foreach (var cat in categorias)
+                {
+                    <option value="@cat.Id">@cat.NombreCat</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => producto.CategoriaId)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Marca</label>
+        <div>
+            <select class="form-control" @bind="producto.MarcaId">
+                <option value="">Seleccione una marca</option>
+                @foreach (var mar in marcas)
+                {
+                    <option value="@mar.Id">@mar.NombreMarca</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => producto.MarcaId)" />
+        </div>
+    </div>
+    <br />
+    <button class="btn btn-success" type="submit">Aceptar</button>
+    <button class="btn btn-danger" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    private Producto producto = new Producto();
+    private List<Categoria> categorias = new List<Categoria>();
+    private List<Marca> marcas = new List<Marca>();
+    private List<string> talles = new List<string> { "S", "M", "L", "XL", "XXL" };
+
+    private string mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarCategorias();
+        await CargarMarcas();
+    }
+
+    private async Task CargarCategorias()
+    {
+        var respuesta = await http.Get<List<Categoria>>("api/Categorias");
+        if (!respuesta.Error)
+        {
+            categorias = respuesta.Respuesta;
+        }
+    }
+
+    private async Task CargarMarcas()
+    {
+        var respuesta = await http.Get<List<Marca>>("api/Marcas");
+        if (!respuesta.Error)
+        {
+            marcas = respuesta.Respuesta;
+        }
+    }
+
+    private async Task Guardar()
+    {
+        var HttpRespuesta = await http.Post<Producto>("api/Productos", producto);
+        if (!HttpRespuesta.Error)
+        {
+            navigationManager.NavigateTo("/api/Productos");
+        }
+        else
+        {
+            mensajeError = "Error al guardar el producto: " + await HttpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("/api/Productos");
+    }
+}

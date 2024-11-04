@@ -1,0 +1,124 @@
+﻿@page "/api/Productos"
+@inject IHttpServicio http
+
+<h3>Productos</h3>
+
+@if (listaProductos != null && listaProductos.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Nombre producto</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Equipo</th>
+                <th scope="col">Liga</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Talle</th>
+                <th scope="col">Cantidad en inventario</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Marca</th>
+@*                 <th scope="col">Acciones</th> *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in combinados)
+            {
+                <tr>
+                    <td>@item.Producto.NombreProd</td>
+                    <td>@item.Producto.Descripcion</td>
+                    <td>@item.Producto.Equipo</td>
+                    <td>@item.Producto.Liga</td>
+                    <td>@String.Format("${0:N2}", item.Producto.Precio)</td>
+                    <td>@item.Producto.Talle</td>
+                    <td>@item.Producto.CantidadEnInventario</td>
+                    <td>@item.Categoria.NombreCat</td>
+                    <td>@item.Marca.NombreMarca</td>
+@*                     <td>
+                        <a class="btn btn-warning btn-sm" href="/api/Productos/editar/@item.Producto.Id">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Producto.Id)">Eliminar</button>
+                    </td> *@
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        No hay productos disponibles.
+    </div>
+}
+
+<a class="btn btn-primary" href="/api/Productos/agregar">
+    <i class="bi bi-plus-circle"></i> Agregar Producto
+</a>
+
+@code {
+    public class ProductoConMarcaYCategoria
+    {
+        public Producto Producto { get; set; }
+        public Marca Marca { get; set; }
+        public Categoria Categoria { get; set; }
+    }
+
+    List<Producto> listaProductos = new List<Producto>();
+    List<Marca> listaMarcas = new List<Marca>();
+    List<Categoria> listaCategorias = new List<Categoria>();
+    List<ProductoConMarcaYCategoria> combinados = new List<ProductoConMarcaYCategoria>();
+
+
+    string Mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await Leer();
+        await LeerMarcas();
+        await LeerCategorias();
+        CrearCombinados(); 
+    }
+
+    private async Task Leer()
+    {
+        var resp = await http.Get<List<Producto>>("api/Productos");
+        if (!resp.Error)
+        {
+            listaProductos = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task LeerMarcas()
+    {
+        var resp = await http.Get<List<Marca>>("api/Marcas");
+        if (!resp.Error)
+        {
+            listaMarcas = resp.Respuesta;
+        }
+    }
+
+    private async Task LeerCategorias()
+    {
+        var resp = await http.Get<List<Categoria>>("api/Categorias");
+        if (!resp.Error)
+        {
+            listaCategorias = resp.Respuesta;
+        }
+    }
+
+    private void CrearCombinados()
+    {
+        combinados = (from p in listaProductos
+                      join m in listaMarcas on p.MarcaId equals m.Id
+                      join c in listaCategorias on p.CategoriaId equals c.Id
+                      select new ProductoConMarcaYCategoria
+                          {
+                              Producto = p,
+                              Marca = m,
+                              Categoria = c
+                          }).ToList();
+    }
+}

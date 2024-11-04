@@ -36,6 +36,16 @@ namespace ProyectoTienda.BD.Data
                 .Property(p => p.PrecioUnitario)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.Marca)
+                .WithMany()
+                .HasForeignKey(p => p.MarcaId);
+
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.Categoria)
+                .WithMany()
+                .HasForeignKey(p => p.CategoriaId);
+
             // Puedes agregar más configuraciones aquí según sea necesario
 
             base.OnModelCreating(modelBuilder);

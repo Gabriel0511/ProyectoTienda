@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProyectoTienda.BD.Data.Entity
+namespace ProyectoTienda.Shared.DTO
 {
-    public class Marca : EntityBase
+    public class CrearMarcaDTO
     {
         [Required(ErrorMessage = "El nombre de la marca es obligatorio")]
         public string NombreMarca { get; set; }

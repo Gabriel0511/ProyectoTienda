@@ -33,16 +33,12 @@ namespace ProyectoTienda.BD.Data.Entity
         [Range(0, int.MaxValue, ErrorMessage = "La cantidad en inventario debe ser un número positivo")]
         public int CantidadEnInventario { get; set; }
 
-        [Required(ErrorMessage = "El ID de la marca es obligatorio")]
         public int MarcaId { get; set; }
 
-        [Required(ErrorMessage = "La marca es obligatoria")]
         public Marca Marca { get; set; }
 
-        [Required(ErrorMessage = "El ID de la categoría es obligatorio")]
         public int CategoriaId { get; set; }
 
-        [Required(ErrorMessage = "La categoría es obligatoria")]
         public Categoria Categoria { get; set; }
     }
 }

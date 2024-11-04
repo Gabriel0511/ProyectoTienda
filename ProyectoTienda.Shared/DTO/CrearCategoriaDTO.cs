@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProyectoTienda.BD.Data.Entity
+namespace ProyectoTienda.Shared.DTO
 {
-    public class Categoria : EntityBase
+    public class CrearCategoriaDTO
     {
         [Required(ErrorMessage = "El nombre de la categoría es obligatorio")]
         public string NombreCat { get; set; }

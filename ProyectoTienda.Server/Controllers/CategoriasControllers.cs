@@ -1,68 +1,47 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoTienda.BD.Data;
 using ProyectoTienda.BD.Data.Entity;
+using ProyectoTienda.Server.Repositorio;
+using ProyectoTienda.Shared.DTO;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProyectoTienda.Server.Controllers
 {
     [ApiController]
     [Route("api/Categorias")]
-
     public class CategoriasControllers : ControllerBase
     {
-        private readonly Context context;
+        private readonly ICategoriaRepositorio repositorio;
+        private readonly IMapper mapper;
 
-        public CategoriasControllers(Context context)
+        public CategoriasControllers(ICategoriaRepositorio repositorio, IMapper mapper)
         {
-            this.context = context;
+            this.repositorio = repositorio;
+            this.mapper = mapper;
         }
+
+        // Método para obtener todos los productos
         [HttpGet]
         public async Task<ActionResult<List<Categoria>>> Get()
         {
-            return await context.Categorias.ToListAsync();
+            return await repositorio.Select();
         }
 
+        // Método para agregar un nuevo producto
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Categoria entidad)
+        public async Task<ActionResult<int>> Post(CrearCategoriaDTO entidadDTO)
         {
             try
             {
-                context.Categorias.Add(entidad);
-                await context.SaveChangesAsync();
-                return entidad.Id;
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
+                Categoria entidad = mapper.Map<Categoria>(entidadDTO);
 
-        [HttpPut("{id:int}")] //api/Categorias/2
-        public async Task<ActionResult> Put(int id, [FromBody] Categoria entidad)
-        {
-            if (id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos");
+                return await repositorio.Insert(entidad);
             }
-
-            var existe = await context.Categorias.Where(e => e.Id == id).FirstOrDefaultAsync();
-
-            if (existe == null)
+            catch (Exception err)
             {
-                return NotFound("No existe el tipo de cliente buscado");
-            }
-
-            existe.NombreCat = entidad.NombreCat;
-
-            try
-            {
-                context.Categorias.Update(existe);
-                await context.SaveChangesAsync();
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
+                return BadRequest(err.Message);
             }
         }
     }

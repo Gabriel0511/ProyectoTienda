@@ -12,15 +12,15 @@ using ProyectoTienda.BD.Data;
 namespace ProyectoTienda.BD.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240923025247_Controllers")]
-    partial class Controllers
+    [Migration("20241102132843_cero")]
+    partial class cero
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -167,22 +167,26 @@ namespace ProyectoTienda.BD.Migrations
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Equipo")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Liga")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("MarcaId")
                         .HasColumnType("int");
 
                     b.Property<string>("NombreProd")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Precio")
                         .HasPrecision(18, 2)
@@ -190,7 +194,8 @@ namespace ProyectoTienda.BD.Migrations
 
                     b.Property<string>("Talle")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.HasKey("Id");
 
