@@ -2,6 +2,11 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<AuthorizeView>
+    <Authorized>
+        <p>Usuario autenticado, hola @context.User.Identity?.Name :D</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>Usuario no autenticado, por favor inicia sesión.</p>
+    </NotAuthorized>
+</AuthorizeView>

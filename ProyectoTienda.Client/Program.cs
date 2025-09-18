@@ -1,13 +1,18 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ProyectoTienda.Client;
+using ProyectoTienda.Client.Autorizacion;
 using ProyectoTienda.Client.Servicios;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddAuthorizationCore();
+
 builder.Services.AddScoped<IHttpServicio, HttpServicio>();
+builder.Services.AddScoped<AuthenticationStateProvider, ProveedorAutenticacion>();
 
 await builder.Build().RunAsync();

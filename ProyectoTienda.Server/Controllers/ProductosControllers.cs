@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using ProyectoTienda.BD.Data;
 using ProyectoTienda.BD.Data.Entity;
+using System.Runtime.InteropServices;
 using ProyectoTienda.Server.Repositorio;
 using ProyectoTienda.Shared.DTO;
 using System.ComponentModel.DataAnnotations;
@@ -15,15 +17,20 @@ namespace ProyectoTienda.Server.Controllers
     {
         private readonly IProductoRepositorio repositorio;
         private readonly IMapper mapper;
+        private readonly IOutputCacheStore outputCacheStore;
 
-        public ProductosControllers(IProductoRepositorio repositorio, IMapper mapper)
+        private const string cacheKey = "Productos";
+
+        public ProductosControllers(IProductoRepositorio repositorio, IMapper mapper, IOutputCacheStore outputCacheStore)
         {
             this.repositorio = repositorio;
             this.mapper = mapper;
+            this.outputCacheStore = outputCacheStore;
         }
 
        // Método para obtener todos los productos
         [HttpGet]
+        [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<List<Producto>>> Get()
         {
             var productos = await repositorio.Select();
@@ -43,6 +50,8 @@ namespace ProyectoTienda.Server.Controllers
             {
                 Producto entidad = mapper.Map<Producto>(entidadDTO);
                 var nuevoId = await repositorio.Insert(entidad);
+
+                await outputCacheStore.EvictByTagAsync(cacheKey, default);
                 return CreatedAtAction(nameof(Get), new { id = nuevoId }, entidad);
             }
             catch (Exception err)
@@ -51,54 +60,60 @@ namespace ProyectoTienda.Server.Controllers
             }
         }
 
-        //// Método para modificar un producto existente
-        //[HttpPut("{id:int}")]
-        //public async Task<ActionResult> Put(int id, [FromBody] CrearProductoDTO dto)
-        //{
-        //    var producto = await context.Productos.FindAsync(id);
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromBody] Producto entidad)
+        {
+            if (id != entidad.Id)
+            {
+                return BadRequest("Datos Incorrectos");
+            }
+            var a = await repositorio.SelectById(id);
 
-        //    if (producto == null)
-        //    {
-        //        return NotFound("No existe el producto buscado");
-        //    }
+            if (a == null)
+            {
+                return NotFound("No existe el producto.");
+            }
 
-        //    producto.NombreProd = dto.NombreProd;
-        //    producto.Descripcion = dto.Descripcion;
-        //    producto.Equipo = dto.Equipo;
-        //    producto.Liga = dto.Liga;
-        //    producto.Precio = dto.Precio;
-        //    producto.Talle = dto.Talle;
-        //    producto.CantidadEnInventario = dto.CantidadEnInventario;
-        //    producto.MarcaId = dto.MarcaId;
-        //    producto.CategoriaId = dto.CategoriaId;
+            a.NombreProd = entidad.NombreProd;
+            a.Descripcion = entidad.Descripcion;
+            a.Equipo = entidad.Equipo;
+            a.Liga = entidad.Liga;
+            a.Precio = entidad.Precio;
+            a.Talle = entidad.Talle;
+            a.CantidadEnInventario = entidad.CantidadEnInventario;
+            a.MarcaId = entidad.MarcaId;
+            a.CategoriaId = entidad.CategoriaId;
 
-        //    try
-        //    {
-        //        context.Productos.Update(producto);
-        //        await context.SaveChangesAsync();
-        //        return Ok("Producto actualizado con éxito");
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest($"Error en la actualización: {e.Message}");
-        //    }
-        //}
+            try
+            {
+                await repositorio.Update(id, a);
+                await outputCacheStore.EvictByTagAsync(cacheKey, default);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
-
-        //// Método para eliminar un producto
-        //[HttpDelete("{id:int}")]
-        //public async Task<ActionResult> Delete(int id)
-        //{
-        //    var producto = await context.Productos.FindAsync(id);
-        //    if (producto == null)
-        //    {
-        //        return NotFound($"El producto con ID {id} no existe");
-        //    }
-
-        //    context.Productos.Remove(producto);
-        //    await context.SaveChangesAsync();
-        //    return Ok("Producto eliminado con éxito");
-        //}
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var existe = await repositorio.Existe(id);
+            if (!existe)
+            {
+                return NotFound($"El producto {id} no existe.");
+            }
+            if (await repositorio.Delete(id))
+            {
+                await outputCacheStore.EvictByTagAsync(cacheKey, default);
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
     }
 }

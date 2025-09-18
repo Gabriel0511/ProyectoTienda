@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ProyectoTienda.BD.Data.Entity;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ProyectoTienda.BD.Data
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext
     {
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Marca> Marcas { get; set; }
