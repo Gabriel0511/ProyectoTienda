@@ -19,7 +19,6 @@ namespace ProyectoTienda.Client.Servicios
             if (response.IsSuccessStatusCode)
             {
                 var respuesta = await DesSerializar<T>(response);
-
                 return new HttpRespuesta<T>(respuesta, false, response);
             }
             else
@@ -28,17 +27,30 @@ namespace ProyectoTienda.Client.Servicios
             }
         }
 
-        public async Task<HttpRespuesta<object>> Post<T>(string url, T entidad)
+        public async Task<HttpRespuesta<TResp>> Post<T, TResp>(string url, T entidad)
         {
             var enviarJson = JsonSerializer.Serialize(entidad);
-
             var enviarContent = new StringContent(enviarJson, Encoding.UTF8, "application/json");
 
             var response = await http.PostAsync(url, enviarContent);
             if (response.IsSuccessStatusCode)
             {
-                var respuesta = await DesSerializar<object>(response);
-                return new HttpRespuesta<object>(respuesta, false, response);
+                var respuesta = await DesSerializar<TResp>(response);
+                return new HttpRespuesta<TResp>(respuesta, false, response);
+            }
+            else
+            {
+                return new HttpRespuesta<TResp>(default, true, response);
+            }
+        }
+
+        public async Task<HttpRespuesta<object>> Delete(string url)
+        {
+            var response = await http.DeleteAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return new HttpRespuesta<object>(null, false, response);
             }
             else
             {
@@ -49,7 +61,8 @@ namespace ProyectoTienda.Client.Servicios
         private async Task<T?> DesSerializar<T>(HttpResponseMessage response)
         {
             var respuestaStr = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(respuestaStr, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<T>(respuestaStr,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
         }
     }
 }

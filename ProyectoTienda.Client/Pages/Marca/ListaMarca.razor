@@ -1,0 +1,91 @@
+﻿@page "/api/Marcas"
+@inject IHttpServicio http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigationManager
+
+<h3>Marcas</h3>
+
+@if (!string.IsNullOrEmpty(Mensaje))
+{
+    <div class="alert alert-danger" role="alert">
+        @Mensaje
+    </div>
+}
+
+@if (listaMarcas != null && listaMarcas.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre de la Marca</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var marca in listaMarcas)
+            {
+                <tr>
+                    <td>@marca.Id</td>
+                    <td>@marca.NombreMarca</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" href="/api/Marcas/editar/@marca.Id">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(marca.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        No hay marcas disponibles.
+    </div>
+}
+
+<a class="btn btn-primary" href="/api/Marcas/agregar">
+    <i class="bi bi-plus-circle"></i> Agregar Marca
+</a>
+
+@code {
+    List<Marca> listaMarcas = new List<Marca>();
+    string Mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LeerMarcas();
+    }
+
+    private async Task LeerMarcas()
+    {
+        var resp = await http.Get<List<Marca>>("api/Marcas");
+        if (!resp.Error)
+        {
+            listaMarcas = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var confirmado = await JSRuntime.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar esta marca?");
+
+        if (confirmado)
+        {
+            var resp = await http.Delete($"api/Marcas/{id}");
+            if (!resp.Error)
+            {
+                await LeerMarcas(); // Recargar la lista
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+                StateHasChanged();
+            }
+        }
+    }
+}

@@ -12,5 +12,14 @@ namespace ProyectoTienda.Server.Repositorio
         {
             this.context = context;
         }
+
+        public async Task<int> Delete(int id)
+        {
+            var entidad = await context.Marcas.FindAsync(id);
+            if (entidad == null) return 0;
+
+            context.Marcas.Remove(entidad);
+            return await context.SaveChangesAsync();
+        }
     }
 }

@@ -1,0 +1,52 @@
+﻿@page "/api/Categorias/agregar"
+@using ProyectoTienda.Shared.DTO
+@inject IHttpServicio http
+@inject NavigationManager navigationManager
+
+<h3>Agregar Categoría</h3>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger" role="alert">
+        @mensajeError
+    </div>
+}
+
+<EditForm Model="categoria" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Nombre de la Categoría</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@categoria.NombreCat" />
+            <ValidationMessage For="@(() => categoria.NombreCat)" />
+        </div>
+    </div>
+
+    <br />
+    <button class="btn btn-success" type="submit">Aceptar</button>
+    <button class="btn btn-danger" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    private CrearCategoriaDTO categoria = new CrearCategoriaDTO();
+    private string mensajeError;
+
+    private async Task Guardar()
+    {
+        var HttpRespuesta = await http.Post<CrearCategoriaDTO, int>("api/Categorias", categoria);
+        if (!HttpRespuesta.Error)
+        {
+            navigationManager.NavigateTo("/api/Categorias");
+        }
+        else
+        {
+            mensajeError = "Error al guardar la categoría: " + await HttpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("/api/Categorias");
+    }
+
+}

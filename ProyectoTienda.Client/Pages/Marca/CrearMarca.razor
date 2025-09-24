@@ -1,0 +1,51 @@
+﻿@page "/api/Marcas/agregar"
+@using ProyectoTienda.Shared.DTO
+@inject IHttpServicio http
+@inject NavigationManager navigationManager
+
+<h3>Agregar Marca</h3>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger" role="alert">
+        @mensajeError
+    </div>
+}
+
+<EditForm Model="marca" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Nombre de la Marca</label>
+        <div>
+            <InputText class="form-control" @bind-Value="@marca.NombreMarca" />
+            <ValidationMessage For="@(() => marca.NombreMarca)" />
+        </div>
+    </div>
+    
+    <br />
+    <button class="btn btn-success" type="submit">Aceptar</button>
+    <button class="btn btn-danger" @onclick="Cancelar">Cancelar</button>
+</EditForm>
+
+@code {
+    private CrearMarcaDTO marca = new CrearMarcaDTO();
+    private string mensajeError;
+
+    private async Task Guardar()
+    {
+        var HttpRespuesta = await http.Post<CrearMarcaDTO, int>("api/Marcas", marca);
+        if (!HttpRespuesta.Error)
+        {
+            navigationManager.NavigateTo("/api/Marcas");
+        }
+        else
+        {
+            mensajeError = "Error al guardar la marca: " + await HttpRespuesta.HttpResponseMessage.Content.ReadAsStringAsync();
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("/api/Marcas");
+    }
+}

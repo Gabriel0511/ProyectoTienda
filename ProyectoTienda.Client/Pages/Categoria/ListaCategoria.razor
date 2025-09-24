@@ -1,0 +1,91 @@
+﻿@page "/api/Categorias"
+@inject IHttpServicio http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigationManager
+
+<h3>Categorías</h3>
+
+@if (!string.IsNullOrEmpty(Mensaje))
+{
+    <div class="alert alert-danger" role="alert">
+        @Mensaje
+    </div>
+}
+
+@if (listaCategorias != null && listaCategorias.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre de la Categoría</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var categoria in listaCategorias)
+            {
+                <tr>
+                    <td>@categoria.Id</td>
+                    <td>@categoria.NombreCat</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" href="/api/Categorias/editar/@categoria.Id">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(categoria.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        No hay categorías disponibles.
+    </div>
+}
+
+<a class="btn btn-primary" href="/api/Categorias/agregar">
+    <i class="bi bi-plus-circle"></i> Agregar Categoría
+</a>
+
+@code {
+    List<Categoria> listaCategorias = new List<Categoria>();
+    string Mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LeerCategorias();
+    }
+
+    private async Task LeerCategorias()
+    {
+        var resp = await http.Get<List<Categoria>>("api/Categorias");
+        if (!resp.Error)
+        {
+            listaCategorias = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
+    }
+
+    private async Task Eliminar(int id)
+    {
+        var confirmado = await JSRuntime.InvokeAsync<bool>("confirm", "¿Está seguro de que desea eliminar esta categoría?");
+
+        if (confirmado)
+        {
+            var resp = await http.Delete($"api/Categorias/{id}");
+            if (!resp.Error)
+            {
+                await LeerCategorias(); // Recargar la lista
+            }
+            else
+            {
+                Mensaje = await resp.ObtenerError();
+                StateHasChanged();
+            }
+        }
+    }
+}

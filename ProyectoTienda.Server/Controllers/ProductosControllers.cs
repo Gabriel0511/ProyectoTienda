@@ -28,7 +28,7 @@ namespace ProyectoTienda.Server.Controllers
             this.outputCacheStore = outputCacheStore;
         }
 
-       // Método para obtener todos los productos
+        // Método para obtener todos los productos
         [HttpGet]
         [OutputCache(Tags = [cacheKey])]
         public async Task<ActionResult<List<Producto>>> Get()
@@ -44,7 +44,7 @@ namespace ProyectoTienda.Server.Controllers
 
         // Método para agregar un nuevo producto
         [HttpPost]
-        public async Task<ActionResult<Producto>> Post(CrearProductoDTO entidadDTO)
+        public async Task<ActionResult<int>> Post(CrearProductoDTO entidadDTO)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace ProyectoTienda.Server.Controllers
                 var nuevoId = await repositorio.Insert(entidad);
 
                 await outputCacheStore.EvictByTagAsync(cacheKey, default);
-                return CreatedAtAction(nameof(Get), new { id = nuevoId }, entidad);
+                return nuevoId;
             }
             catch (Exception err)
             {
@@ -61,32 +61,24 @@ namespace ProyectoTienda.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Producto entidad)
+        public async Task<ActionResult> Put(int id, [FromBody] ActualizarProductoDTO entidadDTO)
         {
-            if (id != entidad.Id)
+            if (id != entidadDTO.Id)
             {
                 return BadRequest("Datos Incorrectos");
             }
-            var a = await repositorio.SelectById(id);
 
-            if (a == null)
+            var productoExistente = await repositorio.SelectById(id);
+            if (productoExistente == null)
             {
                 return NotFound("No existe el producto.");
             }
 
-            a.NombreProd = entidad.NombreProd;
-            a.Descripcion = entidad.Descripcion;
-            a.Equipo = entidad.Equipo;
-            a.Liga = entidad.Liga;
-            a.Precio = entidad.Precio;
-            a.Talle = entidad.Talle;
-            a.CantidadEnInventario = entidad.CantidadEnInventario;
-            a.MarcaId = entidad.MarcaId;
-            a.CategoriaId = entidad.CategoriaId;
+            mapper.Map(entidadDTO, productoExistente);
 
             try
             {
-                await repositorio.Update(id, a);
+                await repositorio.Update(id, productoExistente);
                 await outputCacheStore.EvictByTagAsync(cacheKey, default);
                 return Ok();
             }

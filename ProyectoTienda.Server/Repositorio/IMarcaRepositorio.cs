@@ -4,5 +4,6 @@ namespace ProyectoTienda.Server.Repositorio
 {
     public interface IMarcaRepositorio : IRepositorio<Marca>
     {
+        Task<int> Delete(int id);
     }
 }

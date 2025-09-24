@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProyectoTienda.Shared.DTO
 {
     public class CrearMarcaDTO
     {
         [Required(ErrorMessage = "El nombre de la marca es obligatorio")]
-        public string NombreMarca { get; set; }
+        [StringLength(100, ErrorMessage = "El nombre no puede exceder los 100 caracteres")]
+        public string NombreMarca { get; set; } = string.Empty;
     }
 }

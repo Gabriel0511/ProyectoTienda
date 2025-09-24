@@ -44,5 +44,24 @@ namespace ProyectoTienda.Server.Controllers
                 return BadRequest(err.Message);
             }
         }
+
+        // Agregar este método en tu MarcasControllers
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                var resultado = await repositorio.Delete(id);
+                if (resultado == 0)
+                {
+                    return NotFound($"Marca con ID {id} no encontrada");
+                }
+                return NoContent();
+            }
+            catch (Exception err)
+            {
+                return BadRequest(err.Message);
+            }
+        }
     }
 }

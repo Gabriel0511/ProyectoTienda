@@ -44,5 +44,23 @@ namespace ProyectoTienda.Server.Controllers
                 return BadRequest(err.Message);
             }
         }
+        // Agregar este método en tu CategoriasControllers
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                var resultado = await repositorio.Delete(id);
+                if (resultado == 0)
+                {
+                    return NotFound($"Categoría con ID {id} no encontrada");
+                }
+                return NoContent();
+            }
+            catch (Exception err)
+            {
+                return BadRequest(err.Message);
+            }
+        }
     }
 }

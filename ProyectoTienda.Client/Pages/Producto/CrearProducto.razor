@@ -1,4 +1,5 @@
 ﻿@page "/api/Productos/agregar"
+@using ProyectoTienda.Shared.DTO
 @inject IHttpServicio http
 @inject NavigationManager navigationManager
 
@@ -101,7 +102,7 @@
 </EditForm>
 
 @code {
-    private Producto producto = new Producto();
+    private CrearProductoDTO producto = new CrearProductoDTO();
     private List<Categoria> categorias = new List<Categoria>();
     private List<Marca> marcas = new List<Marca>();
     private List<string> talles = new List<string> { "S", "M", "L", "XL", "XXL" };
@@ -134,7 +135,8 @@
 
     private async Task Guardar()
     {
-        var HttpRespuesta = await http.Post<Producto>("api/Productos", producto);
+        // Cambiado para enviar CrearProductoDTO en lugar de Producto
+        var HttpRespuesta = await http.Post<CrearProductoDTO, int>("api/Productos", producto);
         if (!HttpRespuesta.Error)
         {
             navigationManager.NavigateTo("/api/Productos");

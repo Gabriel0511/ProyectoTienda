@@ -10,6 +10,7 @@ namespace ProyectoTienda.Shared.DTO
     public class CrearCategoriaDTO
     {
         [Required(ErrorMessage = "El nombre de la categoría es obligatorio")]
-        public string NombreCat { get; set; }
+        [StringLength(100, ErrorMessage = "El nombre no puede exceder los 100 caracteres")]
+        public string NombreCat { get; set; } = string.Empty;
     }
 }
